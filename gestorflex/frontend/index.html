@@ -1531,8 +1531,20 @@ document.getElementById('login-senha').addEventListener('keydown', e => {
 });
 
 function applyUser(user) {
-  const ini = user.nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
-  document.getElementById('user-avatar').textContent = ini;
+  const avatarEl = document.getElementById('user-avatar');
+  if (user.foto) {
+    avatarEl.textContent = '';
+    avatarEl.style.background = 'transparent';
+    avatarEl.style.backgroundImage = `url(${user.foto})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.style.boxShadow = '0 2px 8px rgba(0,0,0,.2)';
+  } else {
+    avatarEl.style.background = '';
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.style.boxShadow = '';
+    avatarEl.textContent = user.nome.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase();
+  }
   document.getElementById('user-name').textContent   = user.nome;
   document.getElementById('user-role').textContent   = user.perfil;
   document.getElementById('sidebar-empresa').textContent = user.empresa_nome || '—';

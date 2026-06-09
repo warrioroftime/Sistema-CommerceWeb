@@ -12,7 +12,7 @@ router.post('/login', async (req, res) => {
     if (!email || !senha) return res.status(400).json({ error: 'E-mail e senha obrigatórios.' });
 
     const result = await query(`
-      SELECT u.id, u.empresa_id, u.nome, u.email, u.senha_hash, u.perfil, u.ativo,
+      SELECT u.id, u.empresa_id, u.nome, u.email, u.senha_hash, u.perfil, u.ativo, u.foto,
              e.razao_social AS empresa_nome
       FROM Usuarios u
       JOIN Empresas e ON e.id = u.empresa_id
@@ -28,11 +28,11 @@ router.post('/login', async (req, res) => {
     if (!ok) return res.status(401).json({ error: 'Credenciais inválidas.' });
 
     const payload = {
-      id:          user.id,
-      empresa_id:  user.empresa_id,
-      nome:        user.nome,
-      email:       user.email,
-      perfil:      user.perfil,
+      id:           user.id,
+      empresa_id:   user.empresa_id,
+      nome:         user.nome,
+      email:        user.email,
+      perfil:       user.perfil,
       empresa_nome: user.empresa_nome,
     };
 
@@ -40,7 +40,8 @@ router.post('/login', async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || '8h',
     });
 
-    res.json({ token, user: payload });
+    // foto fora do JWT (base64 pode ser grande demais para o token)
+    res.json({ token, user: { ...payload, foto: user.foto || null } });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Erro interno.' });

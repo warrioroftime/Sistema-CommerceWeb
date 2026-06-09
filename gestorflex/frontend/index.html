@@ -298,7 +298,9 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
 
 /* PDV Right Header */
 .pdv-right-header{background:var(--blue-gradient);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.pdv-right-body{display:flex;flex-direction:column;gap:10px;padding:14px;overflow-y:auto;flex:1}
+.pdv-right-body{display:flex;flex-direction:column;padding:0;overflow:hidden;flex:1}
+.pdv-cart-area{display:flex;flex-direction:column;gap:8px;padding:12px 14px 8px;flex:1;min-height:0;overflow:hidden}
+.pdv-bottom-area{display:flex;flex-direction:column;gap:8px;padding:0 14px 8px;overflow-y:auto;flex-shrink:0;max-height:52%}
 
 /* PDV Search */
 .pdv-search{position:relative}
@@ -330,25 +332,33 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
 /* PDV Cart */
 .pdv-cart-title{font-weight:700;font-size:15px;color:#fff;display:flex;align-items:center;gap:8px}
 .pdv-cart-badge{background:rgba(255,255,255,.25);color:#fff;border-radius:20px;font-size:11px;padding:2px 9px;font-weight:800;backdrop-filter:blur(4px)}
-.pdv-cart-list{overflow-y:auto;min-height:60px;max-height:210px}
-.pdv-cart-item{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
-.pdv-cart-item:last-child{border-bottom:none}
-.pdv-cart-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.pdv-qty-btn{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text2);transition:all .12s;font-family:inherit;flex-shrink:0;line-height:1}
-.pdv-qty-btn:hover{background:var(--blue-glass);color:var(--blue);border-color:var(--blue)}
-.pdv-cart-rm{width:20px;height:20px;border-radius:50%;border:none;background:var(--red-light);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .12s}
+.pdv-cart-list{display:flex;flex-direction:column;gap:7px;overflow-y:auto;flex:1;min-height:0;padding-right:3px}
+.pdv-cart-item{display:flex;align-items:center;gap:9px;background:var(--surface-solid);border:1.5px solid var(--border);border-radius:12px;padding:9px 10px;transition:border-color .15s}
+.pdv-cart-item:hover{border-color:rgba(37,99,235,.3)}
+.pdv-cart-icon{width:36px;height:36px;border-radius:10px;background:var(--blue-gradient);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 3px 8px rgba(37,99,235,.25);text-transform:uppercase}
+.pdv-cart-info{flex:1;min-width:0}
+.pdv-cart-name{font-weight:700;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);line-height:1.3}
+.pdv-cart-unit{font-size:10px;color:var(--text3);margin-top:1px}
+.pdv-cart-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.pdv-cart-sub{font-size:13px;font-weight:800;color:var(--blue);letter-spacing:-.01em}
+.pdv-qty-pill{display:flex;align-items:center;gap:0;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.pdv-qty-btn{width:26px;height:22px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text2);transition:all .12s;font-family:inherit;flex-shrink:0;line-height:1}
+.pdv-qty-btn:hover{background:var(--blue-glass);color:var(--blue)}
+.pdv-qty-num{min-width:24px;text-align:center;font-size:12px;font-weight:800;color:var(--text);border-left:1px solid var(--border);border-right:1px solid var(--border);height:22px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.pdv-cart-rm{width:18px;height:18px;border-radius:50%;border:none;background:var(--red-light);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .12s;align-self:flex-start}
 .pdv-cart-rm:hover{background:var(--red);color:#fff}
 
 /* PDV Cliente bar */
 .pdv-cli-sel-bar{display:none;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(124,58,237,.1));border:1px solid rgba(37,99,235,.25);border-radius:10px;padding:8px 12px;font-size:12px;margin-top:4px}
 
 /* PDV Totals */
-.pdv-totals{background:linear-gradient(135deg,var(--surface2),var(--surface2));border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.pdv-totals{background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
 .pdv-total-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.pdv-total-row input{width:80px;text-align:right;padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
+.pdv-total-row input{width:72px;text-align:right;padding:3px 7px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-weight:700;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
 .pdv-total-row input:focus{border-color:var(--blue)}
-.pdv-total-final{font-size:20px;font-weight:800;border-top:1px solid var(--border);padding-top:10px;margin-top:2px;letter-spacing:-.02em}
-.pdv-total-final span:last-child{background:var(--blue-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pdv-total-final{background:var(--blue-gradient);border-radius:10px;padding:10px 12px;margin-top:2px;display:flex;justify-content:space-between;align-items:center}
+.pdv-total-final span:first-child{color:rgba(255,255,255,.85);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.pdv-total-final span:last-child{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;-webkit-text-fill-color:#fff;background:none}
 
 /* PDV Payment Buttons */
 .pdv-pgto-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em}
@@ -783,106 +793,51 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
             </button>
           </div>
           <div class="pdv-right-body">
-          <!-- Cliente -->
-          <div style="position:relative">
+          <!-- ÁREA SUPERIOR: Cliente + Lista (cresce para ocupar espaço) -->
+          <div class="pdv-cart-area">
             <div style="position:relative">
-              <i class="fa-solid fa-user" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none"></i>
-              <input class="form-input" id="pdv-cli-busca" placeholder="Cliente (opcional)..." oninput="pdvBuscarCliente(this.value)" autocomplete="off" style="padding-left:34px;font-size:12px;padding-top:9px;padding-bottom:9px">
+              <div style="position:relative">
+                <i class="fa-solid fa-user" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none"></i>
+                <input class="form-input" id="pdv-cli-busca" placeholder="Cliente (opcional)..." oninput="pdvBuscarCliente(this.value)" autocomplete="off" style="padding-left:34px;font-size:12px;padding-top:9px;padding-bottom:9px">
+              </div>
+              <div id="pdv-cli-result"></div>
+              <div id="pdv-cli-sel" class="pdv-cli-sel-bar">
+                <i class="fa-solid fa-user-check" style="color:var(--blue)"></i>
+                <span id="pdv-cli-sel-nome" style="flex:1;font-weight:600"></span>
+                <button onclick="pdvLimparCliente()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;line-height:1">✕</button>
+              </div>
             </div>
-            <div id="pdv-cli-result"></div>
-            <div id="pdv-cli-sel" class="pdv-cli-sel-bar">
-              <i class="fa-solid fa-user-check" style="color:var(--blue)"></i>
-              <span id="pdv-cli-sel-nome" style="flex:1;font-weight:600"></span>
-              <button onclick="pdvLimparCliente()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;line-height:1">✕</button>
-            </div>
-          </div>
-          <!-- Itens do Carrinho -->
-          <div id="pdv-cart-items" class="pdv-cart-list">
-            <div style="text-align:center;padding:20px 0;color:var(--text3);font-size:13px">
-              <i class="fa-solid fa-cart-shopping" style="font-size:28px;display:block;margin-bottom:8px;opacity:.35"></i>
-              Carrinho vazio
+            <div id="pdv-cart-items" class="pdv-cart-list">
+              <div style="text-align:center;padding:28px 0;color:var(--text3);font-size:12px;font-weight:500"><div style="width:52px;height:52px;border-radius:50%;background:var(--surface2);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><i class="fa-solid fa-cart-shopping" style="font-size:20px;opacity:.4"></i></div>Nenhum produto adicionado</div>
             </div>
           </div>
+          <!-- ÁREA INFERIOR: Totais + Obs (compacto) -->
+          <div class="pdv-bottom-area">
           <!-- Totais -->
           <div class="pdv-totals">
             <div class="pdv-total-row">
-              <span style="color:var(--text2)">Subtotal</span>
-              <span id="pdv-sub" style="font-weight:600">R$ 0,00</span>
+              <span style="color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Subtotal</span>
+              <span id="pdv-sub" style="font-weight:700;font-size:13px">R$ 0,00</span>
             </div>
             <div class="pdv-total-row">
-              <span style="color:var(--text2)">Desconto (R$)</span>
-              <input id="pdv-desc" type="number" min="0" step="0.01" value="0" oninput="pdvRecalc()">
+              <span style="color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Desconto</span>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span style="font-size:11px;color:var(--text3)">R$</span>
+                <input id="pdv-desc" type="number" min="0" step="0.01" value="0" oninput="pdvRecalc()">
+              </div>
             </div>
-            <div class="pdv-total-row pdv-total-final">
-              <span>TOTAL</span>
+            <div class="pdv-total-final">
+              <span>TOTAL A PAGAR</span>
               <span id="pdv-total">R$ 0,00</span>
-            </div>
-          </div>
-          <!-- Formas de Pagamento -->
-          <div class="pdv-pgto-title">Forma de Pagamento</div>
-          <div class="pdv-pgto-grid">
-            <button class="pdv-pgto-btn active" data-pgto="dinheiro" onclick="pdvSetPgto('dinheiro')">
-              <i class="fa-solid fa-money-bills"></i> Dinheiro
-            </button>
-            <button class="pdv-pgto-btn" data-pgto="pix" onclick="pdvSetPgto('pix')">
-              <i class="fa-brands fa-pix"></i> PIX
-            </button>
-            <button class="pdv-pgto-btn" data-pgto="credito" onclick="pdvSetPgto('credito')">
-              <i class="fa-solid fa-credit-card"></i> Crédito
-            </button>
-            <button class="pdv-pgto-btn" data-pgto="debito" onclick="pdvSetPgto('debito')">
-              <i class="fa-regular fa-credit-card"></i> Débito
-            </button>
-            <button class="pdv-pgto-btn" data-pgto="transferencia" onclick="pdvSetPgto('transferencia')">
-              <i class="fa-solid fa-building-columns"></i> Transf.
-            </button>
-            <button class="pdv-pgto-btn" data-pgto="fiado" onclick="pdvSetPgto('fiado')">
-              <i class="fa-solid fa-handshake"></i> Fiado
-            </button>
-          </div>
-          <!-- Fiado: vencimento + parcelamento -->
-          <div id="pdv-fiado-box" class="pdv-fiado-box" style="display:none">
-            <div>
-              <label><i class="fa-regular fa-calendar-days"></i> Vencimento da 1ª Parcela</label>
-              <input type="date" id="pdv-fiado-venc" oninput="pdvRenderParcelasPreview()">
-            </div>
-            <div>
-              <label><i class="fa-solid fa-list-ol"></i> Forma de Cobrança</label>
-              <div class="parc-toggle">
-                <button class="parc-toggle-btn active" id="pdv-parc-avista" onclick="pdvSetParcelado(false)">À Vista</button>
-                <button class="parc-toggle-btn" id="pdv-parc-parcelado" onclick="pdvSetParcelado(true)">Parcelado</button>
-              </div>
-            </div>
-            <div id="pdv-parcelas-box" style="display:none">
-              <label><i class="fa-solid fa-hashtag"></i> Número de Parcelas</label>
-              <div class="parc-count-grid" id="pdv-parc-count-grid">
-                <button class="parc-count-btn active" data-n="2" onclick="pdvSetParcelas(2)">2x</button>
-                <button class="parc-count-btn" data-n="3" onclick="pdvSetParcelas(3)">3x</button>
-                <button class="parc-count-btn" data-n="4" onclick="pdvSetParcelas(4)">4x</button>
-                <button class="parc-count-btn" data-n="5" onclick="pdvSetParcelas(5)">5x</button>
-                <button class="parc-count-btn" data-n="6" onclick="pdvSetParcelas(6)">6x</button>
-                <button class="parc-count-btn" data-n="8" onclick="pdvSetParcelas(8)">8x</button>
-                <button class="parc-count-btn" data-n="10" onclick="pdvSetParcelas(10)">10x</button>
-                <button class="parc-count-btn" data-n="12" onclick="pdvSetParcelas(12)">12x</button>
-              </div>
-              <div class="pdv-parc-preview" id="pdv-parc-preview" style="margin-top:8px"></div>
-            </div>
-          </div>
-          <!-- Troco (dinheiro) -->
-          <div id="pdv-troco-box" class="pdv-troco">
-            <label><i class="fa-solid fa-coins" style="margin-right:4px"></i> Valor recebido (R$)</label>
-            <input id="pdv-recebido" type="number" min="0" step="0.01" value="" placeholder="0,00" oninput="pdvCalcTroco()">
-            <div class="pdv-troco-result">
-              <span style="font-size:13px;color:var(--text2)">Troco:</span>
-              <span id="pdv-troco" style="color:var(--green)">R$ 0,00</span>
             </div>
           </div>
           <!-- Obs -->
           <input class="form-input" id="pdv-obs" placeholder="Observação (opcional)" style="font-size:12px;padding-top:8px;padding-bottom:8px">
+          </div><!-- /pdv-bottom-area -->
           </div><!-- /pdv-right-body -->
           <!-- Finalizar -->
           <div style="padding:10px 14px 14px;flex-shrink:0">
-            <button id="pdv-btn-fin" class="pdv-finalizar" onclick="pdvFinalizar()">
+            <button class="pdv-finalizar" onclick="pdvAbrirModalPgto()">
               <i class="fa-solid fa-circle-check"></i> FINALIZAR VENDA
             </button>
           </div>
@@ -1165,6 +1120,94 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
 </div><!-- /main -->
 
 <!-- ── MODAIS ──────────────────────────────────────────────────── -->
+
+<!-- Modal PDV: Forma de Pagamento -->
+<div class="modal-backdrop" id="modal-pdv-pgto">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fa-solid fa-credit-card" style="margin-right:8px;color:var(--blue)"></i>Finalizar Venda</div>
+      <button class="btn-icon" onclick="pdvFecharModalPgto()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+      <!-- Resumo -->
+      <div style="background:var(--blue-gradient);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.75);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Total a Pagar</div>
+          <div id="mpgto-total" style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-.02em;margin-top:2px">R$ 0,00</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:rgba(255,255,255,.75);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Itens</div>
+          <div id="mpgto-qtd" style="font-size:26px;font-weight:800;color:#fff;margin-top:2px">0</div>
+        </div>
+      </div>
+      <!-- Botões de pagamento -->
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Forma de Pagamento</div>
+        <div class="pdv-pgto-grid">
+          <button class="pdv-pgto-btn active" data-pgto="dinheiro" onclick="pdvSetPgto('dinheiro')"><i class="fa-solid fa-money-bills"></i> Dinheiro</button>
+          <button class="pdv-pgto-btn" data-pgto="pix" onclick="pdvSetPgto('pix')"><i class="fa-brands fa-pix"></i> PIX</button>
+          <button class="pdv-pgto-btn" data-pgto="credito" onclick="pdvSetPgto('credito')"><i class="fa-solid fa-credit-card"></i> Crédito</button>
+          <button class="pdv-pgto-btn" data-pgto="debito" onclick="pdvSetPgto('debito')"><i class="fa-regular fa-credit-card"></i> Débito</button>
+          <button class="pdv-pgto-btn" data-pgto="transferencia" onclick="pdvSetPgto('transferencia')"><i class="fa-solid fa-building-columns"></i> Transf.</button>
+          <button class="pdv-pgto-btn" data-pgto="fiado" onclick="pdvSetPgto('fiado')"><i class="fa-solid fa-handshake"></i> Fiado</button>
+        </div>
+      </div>
+      <!-- Troco (Dinheiro) -->
+      <div id="pdv-troco-box" style="display:none;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;flex-direction:column;gap:10px">
+        <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-coins" style="color:var(--amber)"></i> Calcular Troco</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="flex:1">
+            <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:5px">Valor Recebido (R$)</label>
+            <input id="pdv-recebido" type="number" min="0" step="0.01" value="" placeholder="0,00" oninput="pdvCalcTroco()" class="form-input" style="font-size:20px;font-weight:800;text-align:right">
+          </div>
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-size:11px;color:var(--text3);font-weight:600;margin-bottom:4px">Troco</div>
+            <div id="pdv-troco" style="font-size:26px;font-weight:800;color:var(--green)">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+      <!-- Fiado -->
+      <div id="pdv-fiado-box" style="display:none;background:var(--amber-light);border:1.5px solid var(--amber);border-radius:12px;padding:14px 16px;flex-direction:column;gap:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-triangle-exclamation"></i> Venda a Prazo — Cliente obrigatório</div>
+        <div id="pdv-fiado-cli-status" style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);border-radius:8px;padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-user-check" style="color:var(--blue)"></i>
+          <span id="pdv-fiado-cli-nome" style="flex:1;font-weight:600">Nenhum cliente selecionado</span>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:5px"><i class="fa-regular fa-calendar-days"></i> Vencimento da 1ª Parcela</label>
+          <input type="date" class="form-input" id="pdv-fiado-venc" oninput="pdvRenderParcelasPreview()">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:5px"><i class="fa-solid fa-list-ol"></i> Forma de Cobrança</label>
+          <div class="parc-toggle">
+            <button class="parc-toggle-btn active" id="pdv-parc-avista" onclick="pdvSetParcelado(false)">À Vista</button>
+            <button class="parc-toggle-btn" id="pdv-parc-parcelado" onclick="pdvSetParcelado(true)">Parcelado</button>
+          </div>
+        </div>
+        <div id="pdv-parcelas-box" style="display:none">
+          <label style="font-size:11px;color:var(--text3);font-weight:600;display:block;margin-bottom:6px"><i class="fa-solid fa-hashtag"></i> Número de Parcelas</label>
+          <div class="parc-count-grid" id="pdv-parc-count-grid">
+            <button class="parc-count-btn active" data-n="2" onclick="pdvSetParcelas(2)">2x</button>
+            <button class="parc-count-btn" data-n="3" onclick="pdvSetParcelas(3)">3x</button>
+            <button class="parc-count-btn" data-n="4" onclick="pdvSetParcelas(4)">4x</button>
+            <button class="parc-count-btn" data-n="5" onclick="pdvSetParcelas(5)">5x</button>
+            <button class="parc-count-btn" data-n="6" onclick="pdvSetParcelas(6)">6x</button>
+            <button class="parc-count-btn" data-n="8" onclick="pdvSetParcelas(8)">8x</button>
+            <button class="parc-count-btn" data-n="10" onclick="pdvSetParcelas(10)">10x</button>
+            <button class="parc-count-btn" data-n="12" onclick="pdvSetParcelas(12)">12x</button>
+          </div>
+          <div class="pdv-parc-preview" id="pdv-parc-preview" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="pdvFecharModalPgto()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+      <button class="btn btn-primary" id="pdv-btn-fin" onclick="pdvFinalizar()" style="min-width:180px;justify-content:center;font-size:14px;font-weight:700;padding:11px 20px">
+        <i class="fa-solid fa-circle-check"></i> CONFIRMAR VENDA
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Produto -->
 <div class="modal-backdrop" id="modal-produto">
@@ -2212,16 +2255,26 @@ function pdvRenderCart() {
   const total = pdvCart.reduce((s, c) => s + c.qty, 0);
   badge.textContent = total;
   if (!pdvCart.length) {
-    el.innerHTML = '<div style="text-align:center;padding:20px 0;color:var(--text3);font-size:13px"><i class="fa-solid fa-cart-shopping" style="font-size:28px;display:block;margin-bottom:8px;opacity:.35"></i>Carrinho vazio</div>';
+    el.innerHTML = '<div style="text-align:center;padding:28px 0;color:var(--text3);font-size:12px;font-weight:500"><div style="width:52px;height:52px;border-radius:50%;background:var(--surface2);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 10px"><i class="fa-solid fa-cart-shopping" style="font-size:20px;opacity:.4"></i></div>Nenhum produto adicionado</div>';
   } else {
     el.innerHTML = pdvCart.map((it, i) => `
       <div class="pdv-cart-item">
-        <button class="pdv-qty-btn" onclick="pdvChangeQty(${i},-1)" title="Diminuir">−</button>
-        <span style="min-width:22px;text-align:center;font-weight:800;font-size:13px">${it.qty}</span>
-        <button class="pdv-qty-btn" onclick="pdvChangeQty(${i},1)" title="Aumentar">+</button>
-        <span class="pdv-cart-name" title="${it.desc}">${it.desc}</span>
-        <span style="font-weight:700;font-size:12px;white-space:nowrap;color:var(--blue)">${R(it.sub)}</span>
-        <button class="pdv-cart-rm" onclick="pdvRemoveItem(${i})" title="Remover item"><i class="fa-solid fa-xmark"></i></button>
+        <div class="pdv-cart-icon">${it.desc.charAt(0)}</div>
+        <div class="pdv-cart-info">
+          <div class="pdv-cart-name" title="${it.desc}">${it.desc}</div>
+          <div class="pdv-cart-unit">${R(it.preco)} / un.</div>
+        </div>
+        <div class="pdv-cart-right">
+          <span class="pdv-cart-sub">${R(it.sub)}</span>
+          <div style="display:flex;align-items:center;gap:5px">
+            <div class="pdv-qty-pill">
+              <button class="pdv-qty-btn" onclick="pdvChangeQty(${i},-1)" title="Diminuir">−</button>
+              <span class="pdv-qty-num">${it.qty}</span>
+              <button class="pdv-qty-btn" onclick="pdvChangeQty(${i},1)" title="Aumentar">+</button>
+            </div>
+            <button class="pdv-cart-rm" onclick="pdvRemoveItem(${i})" title="Remover"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
       </div>`).join('');
   }
   pdvRecalc();
@@ -2239,11 +2292,39 @@ function pdvRecalc() {
 let pdvParcelado = false;
 let pdvNumParcelas = 2;
 
+function pdvAbrirModalPgto() {
+  if (!pdvCart.length) { toast('Adicione ao menos um produto ao carrinho.', 'error'); return; }
+  // Preenche total e qtd de itens no modal
+  document.getElementById('mpgto-total').textContent = document.getElementById('pdv-total').textContent;
+  const qtd = pdvCart.reduce((s, c) => s + c.qty, 0);
+  document.getElementById('mpgto-qtd').textContent = qtd + (qtd === 1 ? ' item' : ' itens');
+  // Mostra cliente selecionado na seção fiado
+  const nomeEl = document.getElementById('pdv-fiado-cli-nome');
+  if (nomeEl) nomeEl.textContent = pdvClienteSel ? pdvClienteSel.nome : 'Nenhum cliente selecionado';
+  // Reset troco
+  const rec = document.getElementById('pdv-recebido'); if (rec) rec.value = '';
+  const trc = document.getElementById('pdv-troco'); if (trc) trc.textContent = 'R$ 0,00';
+  // Aplica o pagamento atual
+  pdvSetPgto(pdvPgto);
+  document.getElementById('modal-pdv-pgto').classList.add('open');
+}
+
+function pdvFecharModalPgto() {
+  document.getElementById('modal-pdv-pgto').classList.remove('open');
+}
+
 function pdvSetPgto(tipo) {
   pdvPgto = tipo;
   document.querySelectorAll('.pdv-pgto-btn').forEach(b => b.classList.toggle('active', b.dataset.pgto === tipo));
-  document.getElementById('pdv-troco-box').style.display  = tipo === 'dinheiro' ? 'block' : 'none';
-  document.getElementById('pdv-fiado-box').style.display  = tipo === 'fiado'    ? 'flex'  : 'none';
+  const troco = document.getElementById('pdv-troco-box');
+  const fiado = document.getElementById('pdv-fiado-box');
+  if (troco) troco.style.display = tipo === 'dinheiro' ? 'flex' : 'none';
+  if (fiado) fiado.style.display = tipo === 'fiado'    ? 'flex' : 'none';
+  // Atualiza nome do cliente no fiado
+  if (tipo === 'fiado') {
+    const nomeEl = document.getElementById('pdv-fiado-cli-nome');
+    if (nomeEl) nomeEl.textContent = pdvClienteSel ? pdvClienteSel.nome : 'Nenhum cliente selecionado';
+  }
   if (tipo !== 'dinheiro') document.getElementById('pdv-troco').textContent = 'R$ 0,00';
   if (tipo === 'fiado') {
     const d = new Date(); d.setDate(d.getDate() + 30);
@@ -2390,21 +2471,21 @@ function pdvLimpar() {
 }
 
 async function pdvFinalizar() {
-  if (!pdvCart.length) { toast('Adicione ao menos um produto ao carrinho.', 'error'); return; }
   if (pdvPgto === 'fiado' && !pdvClienteSel) {
-    toast('Venda a prazo (fiado) exige um cliente selecionado.', 'error');
+    toast('Venda a prazo (fiado) exige um cliente selecionado no carrinho.', 'error');
+    pdvFecharModalPgto();
     const inp = document.getElementById('pdv-cli-busca');
     if (inp) { inp.focus(); inp.style.borderColor = 'var(--red)'; setTimeout(() => inp.style.borderColor = '', 2500); }
     return;
   }
   if (pdvPgto === 'dinheiro') {
     const totalText = document.getElementById('pdv-total').textContent;
-    const total = parseFloat(totalText.replace('R$','').trim().replace('.','').replace(',','.')) || 0;
+    const total = parseFloat(totalText.replace('R$','').trim().replace(/\./g,'').replace(',','.')) || 0;
     const recebido = parseFloat(document.getElementById('pdv-recebido')?.value) || 0;
     if (recebido > 0 && recebido < total) { toast('Valor recebido insuficiente!', 'error'); return; }
   }
   if (pdvPgto === 'fiado') {
-    const venc = document.getElementById('pdv-fiado-venc').value;
+    const venc = document.getElementById('pdv-fiado-venc')?.value;
     if (!venc) { toast('Informe a data de vencimento.', 'error'); return; }
   }
   const desc = parseFloat(document.getElementById('pdv-desc').value) || 0;
@@ -2414,7 +2495,7 @@ async function pdvFinalizar() {
     pagamento:       pdvPgto,
     desconto:        desc,
     observacao:      obs || null,
-    data_vencimento: pdvPgto === 'fiado' ? (document.getElementById('pdv-fiado-venc').value || null) : null,
+    data_vencimento: pdvPgto === 'fiado' ? (document.getElementById('pdv-fiado-venc')?.value || null) : null,
     parcelas:        pdvPgto === 'fiado' && pdvParcelado ? pdvNumParcelas : 1,
     itens: pdvCart.map(c => ({ produto_id: c.id, quantidade: c.qty })),
   };
@@ -2423,6 +2504,7 @@ async function pdvFinalizar() {
   btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin-right:8px"></div> Processando...';
   try {
     const venda = await api.post('/vendas', body);
+    pdvFecharModalPgto();
     toast(`Venda #${venda.id || ''} finalizada com sucesso!`, 'success');
     if (venda.id) mostrarComprovante(venda);
     pdvCart = [];
@@ -2431,13 +2513,13 @@ async function pdvFinalizar() {
     if (document.getElementById('pdv-desc')) document.getElementById('pdv-desc').value = '0';
     if (document.getElementById('pdv-obs')) document.getElementById('pdv-obs').value = '';
     if (document.getElementById('pdv-recebido')) document.getElementById('pdv-recebido').value = '';
-    document.getElementById('pdv-troco').textContent = 'R$ 0,00';
+    const trc = document.getElementById('pdv-troco'); if (trc) trc.textContent = 'R$ 0,00';
     pdvLimparCliente();
     loadPDV();
   } catch (err) { toast(err.message, 'error'); }
   finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> FINALIZAR VENDA';
+    btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> CONFIRMAR VENDA';
   }
 }
 

@@ -42,10 +42,16 @@ CREATE TABLE Usuarios (
     senha_hash   NVARCHAR(255) NOT NULL,
     perfil       NVARCHAR(20) NOT NULL DEFAULT 'operador'
                  CHECK (perfil IN ('admin','gerente','operador')),
+    foto         NVARCHAR(MAX) NULL,
     ativo        BIT NOT NULL DEFAULT 1,
     criado_em    DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT UQ_usuarios_email UNIQUE (empresa_id, email)
 );
+GO
+
+-- Adiciona coluna foto se já existir a tabela sem ela
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID('Usuarios') AND name='foto')
+  ALTER TABLE Usuarios ADD foto NVARCHAR(MAX) NULL;
 GO
 
 -- ----------------------------------------------------------------

@@ -85,7 +85,7 @@ router.get('/usuarios', async (req, res) => {
     const empresaFilter = req.query.empresa_id ? 'AND u.empresa_id=@emp' : '';
     const params = req.query.empresa_id ? { emp: parseInt(req.query.empresa_id) } : {};
     const r = await query(`
-      SELECT u.id, u.nome, u.email, u.perfil, u.ativo, u.criado_em,
+      SELECT u.id, u.nome, u.email, u.perfil, u.foto, u.ativo, u.criado_em,
              e.razao_social AS empresa_nome, e.id AS empresa_id
       FROM Usuarios u
       JOIN Empresas e ON e.id = u.empresa_id
@@ -102,7 +102,7 @@ router.get('/usuarios', async (req, res) => {
 // POST /api/admin/usuarios
 router.post('/usuarios', async (req, res) => {
   try {
-    const { empresa_id, nome, email, senha, perfil } = req.body;
+    const { empresa_id, nome, email, senha, perfil, foto } = req.body;
     if (!empresa_id || !nome || !email || !senha) {
       return res.status(400).json({ error: 'Empresa, nome, e-mail e senha são obrigatórios.' });
     }
@@ -110,10 +110,10 @@ router.post('/usuarios', async (req, res) => {
 
     const hash = await bcrypt.hash(senha, 10);
     const r = await query(`
-      INSERT INTO Usuarios (empresa_id, nome, email, senha_hash, perfil)
+      INSERT INTO Usuarios (empresa_id, nome, email, senha_hash, perfil, foto)
       OUTPUT INSERTED.id
-      VALUES (@empresa_id, @nome, @email, @hash, @perfil)
-    `, { empresa_id: parseInt(empresa_id), nome, email, hash, perfil: perfil||'operador' });
+      VALUES (@empresa_id, @nome, @email, @hash, @perfil, @foto)
+    `, { empresa_id: parseInt(empresa_id), nome, email, hash, perfil: perfil||'operador', foto: foto||null });
 
     res.status(201).json({ id: r.recordset[0].id });
   } catch (err) {
@@ -128,12 +128,15 @@ router.post('/usuarios', async (req, res) => {
 // PUT /api/admin/usuarios/:id
 router.put('/usuarios/:id', async (req, res) => {
   try {
-    const { nome, email, perfil } = req.body;
+    const { nome, email, perfil, foto } = req.body;
     if (!nome || !email) return res.status(400).json({ error: 'Nome e e-mail obrigatórios.' });
 
     await query(`
-      UPDATE Usuarios SET nome=@nome, email=@email, perfil=@perfil WHERE id=@id
-    `, { nome, email, perfil: perfil||'operador', id: parseInt(req.params.id) });
+      UPDATE Usuarios
+      SET nome=@nome, email=@email, perfil=@perfil,
+          foto=CASE WHEN @foto IS NOT NULL THEN @foto ELSE foto END
+      WHERE id=@id
+    `, { nome, email, perfil: perfil||'operador', foto: foto !== undefined ? (foto||null) : null, id: parseInt(req.params.id) });
 
     res.json({ ok: true });
   } catch (err) {

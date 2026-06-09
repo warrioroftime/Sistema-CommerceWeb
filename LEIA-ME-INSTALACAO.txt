@@ -2,67 +2,75 @@
 ║            GestorFlex — Guia de Instalação               ║
 ╚══════════════════════════════════════════════════════════╝
 
-PRÉ-REQUISITOS (instale antes de rodar o instalador):
+O INSTALADOR CUIDA DE TUDO AUTOMATICAMENTE:
 ──────────────────────────────────────────────────────
- 1. Windows 10 ou superior (64 bits)
- 2. SQL Server Express (gratuito):
-    https://www.microsoft.com/pt-br/sql-server/sql-server-downloads
-    → Escolha "Express" → Instale com as opções padrão
-    → Anote o nome da instância (ex: .\SQLEXPRESS)
- 3. SQL Server Management Studio (opcional, para gerenciar o banco):
-    https://aka.ms/ssmsfullsetup
+  ✔ Node.js LTS           → instalado via winget se necessário
+  ✔ SQL Server 2022 Express → baixado e instalado se necessário (~300 MB)
+  ✔ Banco de dados GestorFlex → criado e configurado
+  ✔ Dependências Node.js  → npm install automático
+  ✔ Atalhos na Área de Trabalho → criados ao final
 
-OBS: O Node.js será instalado automaticamente pelo instalador
-     caso não esteja presente na máquina.
+PRÉ-REQUISITOS MÍNIMOS:
+──────────────────────────────────────────────────────
+  • Windows 10 ou superior (64 bits)
+  • Conexão com a internet (apenas durante a instalação)
+  • Executar como Administrador (recomendado)
 
 COMO INSTALAR:
 ──────────────────────────────────────────────────────
- 1. Copie esta pasta inteira para a máquina destino
-    (ou clone o repositório: git clone https://github.com/warrioroftime/Sistema-SAS.git)
+  1. Copie esta pasta para a máquina destino
+     (ou clone: git clone https://github.com/warrioroftime/Sistema-SAS.git)
 
- 2. Clique com o botão direito em "instalar.ps1"
-    → Executar com o PowerShell
-    (Se aparecer erro de política: abra o PowerShell como Administrador e execute:
-     powershell -ExecutionPolicy Bypass -File instalar.ps1)
+  2. Clique com botão direito em "instalar.ps1"
+     → "Executar com o PowerShell"
 
- 3. Siga as instruções na tela:
-    - Confirme o diretório de instalação (padrão: C:\GestorFlex)
-    - Informe os dados de conexão do SQL Server
-    - Aguarde a instalação das dependências
+     Se aparecer erro de política de execução:
+     → Abra o PowerShell como Administrador e execute:
+       powershell -ExecutionPolicy Bypass -File instalar.ps1
 
- 4. Ao final, dois atalhos serão criados na Área de Trabalho:
-    • GestorFlex - Iniciar  → inicia os servidores e abre o navegador
-    • GestorFlex - Parar    → encerra os servidores
+  3. Siga as instruções na tela:
+     - Confirme o diretório (padrão: C:\GestorFlex)
+     - Caso o SQL Server não esteja instalado, defina uma senha
+       para o administrador do banco (SA)
+     - Aguarde a instalação (pode levar 10-20 min na primeira vez)
+
+  4. Ao final, dois atalhos são criados na Área de Trabalho:
+     • GestorFlex - Iniciar → abre o sistema no navegador
+     • GestorFlex - Parar   → encerra os servidores
 
 COMO USAR APÓS INSTALAÇÃO:
 ──────────────────────────────────────────────────────
- • Duplo clique em "GestorFlex - Iniciar" na Área de Trabalho
- • O sistema abrirá automaticamente em http://localhost:5500
- • Para parar: duplo clique em "GestorFlex - Parar"
+  • Duplo clique em "GestorFlex - Iniciar" na Área de Trabalho
+  • O sistema abre em http://localhost:5500
+  • Para encerrar: duplo clique em "GestorFlex - Parar"
 
-ARQUIVOS DA INSTALAÇÃO:
+ARQUIVOS:
 ──────────────────────────────────────────────────────
- instalar.ps1      → Execute para instalar em uma nova máquina
- iniciar.bat       → Inicia os servidores manualmente
- parar.bat         → Para os servidores
- gestorflex/
-   backend/        → Servidor Node.js (porta 3001)
-   frontend/       → Interface web (porta 5500)
+  instalar.ps1            → Instalador principal
+  iniciar.bat             → Inicia os servidores
+  parar.bat               → Para os servidores
+  LEIA-ME-INSTALACAO.txt  → Este arquivo
+  gestorflex/
+    backend/              → Servidor Node.js (porta 3001)
+    frontend/             → Interface web (porta 5500)
 
-SUPORTE / PROBLEMAS COMUNS:
+PROBLEMAS COMUNS:
 ──────────────────────────────────────────────────────
- ❌ "Não consigo conectar ao SQL Server"
-    → Verifique se o serviço SQL Server está iniciado
-    → Painel de Controle → Serviços → SQL Server (SQLEXPRESS)
-    → Certifique-se que o login "sa" está habilitado no SQL Server
+  ❌ Erro de política do PowerShell
+     → Execute: powershell -ExecutionPolicy Bypass -File instalar.ps1
 
- ❌ "Porta 3001 já está em uso"
-    → Execute parar.bat e tente novamente
+  ❌ "winget não reconhecido"
+     → Atualize o Windows ou instale manualmente:
+       Node.js: https://nodejs.org (versão LTS)
+       SQL Server Express: https://www.microsoft.com/pt-br/sql-server/sql-server-downloads
 
- ❌ "node não é reconhecido como comando"
-    → Instale o Node.js em https://nodejs.org (versão LTS)
-    → Reinicie o computador após instalar
+  ❌ Falha no download do SQL Server
+     → Verifique a conexão com a internet
+     → Instale manualmente o SQL Server Express e re-execute instalar.ps1
 
- ❌ Erro de política do PowerShell
-    → Abra PowerShell como Administrador e execute:
-      Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+  ❌ "Porta 3001 ou 5500 já está em uso"
+     → Execute parar.bat e tente novamente
+
+  ❌ SQL Server não conecta após instalação
+     → Abra "Serviços" do Windows → inicie "SQL Server (SQLEXPRESS)"
+     → Certifique-se que o login SA está habilitado

@@ -98,5 +98,10 @@ const RelatoriosAPI = {
   vendas:    (params = {})  => api.get('/relatorios/vendas?' + new URLSearchParams(params)),
 };
 
+// ── CNPJ ──────────────────────────────────────────────────────
+const CnpjAPI = {
+  buscar: (cnpj) => api.get('/cnpj/' + cnpj.replace(/\D/g, '')),
+};
+
 // Exportar para uso global no HTML
-window.GF = { Auth, AuthAPI, ProdutosAPI, ClientesAPI, VendasAPI, EstoqueAPI, RelatoriosAPI };
+window.GF = { Auth, AuthAPI, ProdutosAPI, ClientesAPI, VendasAPI, EstoqueAPI, RelatoriosAPI, CnpjAPI };

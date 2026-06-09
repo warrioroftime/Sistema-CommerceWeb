@@ -4,7 +4,8 @@ const { query } = require('../db');
 const { auth } = require('../middleware/auth');
 
 const BASE = `
-  SELECT id, nome, documento, telefone, email, endereco, cidade, estado, ativo, criado_em
+  SELECT id, nome, nome_fantasia, documento, telefone, email,
+         cep, endereco, numero, bairro, cidade, estado, ativo, criado_em
   FROM Clientes
   WHERE empresa_id = @emp AND ativo = 1
 `;
@@ -23,7 +24,8 @@ router.get('/', auth, async (req, res) => {
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const r = await query(
-      `SELECT id, nome, documento, telefone, email, endereco, cidade, estado, criado_em
+      `SELECT id, nome, nome_fantasia, documento, telefone, email,
+              cep, endereco, numero, bairro, cidade, estado, criado_em
        FROM Clientes WHERE ${where}
        ORDER BY nome
        OFFSET ${offset} ROWS FETCH NEXT ${parseInt(limit)} ROWS ONLY`,
@@ -114,18 +116,22 @@ router.get('/:id', auth, async (req, res) => {
 // POST /api/clientes
 router.post('/', auth, async (req, res) => {
   try {
-    const { nome, documento, telefone, email, endereco, cidade, estado } = req.body;
+    const { nome, nome_fantasia, documento, telefone, email,
+            cep, endereco, numero, bairro, cidade, estado } = req.body;
     if (!nome) return res.status(400).json({ error: 'Nome obrigatório.' });
 
     const r = await query(`
-      INSERT INTO Clientes (empresa_id, nome, documento, telefone, email, endereco, cidade, estado)
+      INSERT INTO Clientes
+        (empresa_id, nome, nome_fantasia, documento, telefone, email,
+         cep, endereco, numero, bairro, cidade, estado)
       OUTPUT INSERTED.id
-      VALUES (@emp, @nome, @doc, @tel, @email, @end, @cid, @est)
+      VALUES (@emp, @nome, @fantasia, @doc, @tel, @email, @cep, @end, @num, @bairro, @cid, @est)
     `, {
-      emp:   req.user.empresa_id,
-      nome, doc: documento||null, tel: telefone||null,
-      email: email||null, end: endereco||null,
-      cid: cidade||null, est: estado||null,
+      emp: req.user.empresa_id,
+      nome, fantasia: nome_fantasia||null, doc: documento||null,
+      tel: telefone||null, email: email||null,
+      cep: cep||null, end: endereco||null, num: numero||null,
+      bairro: bairro||null, cid: cidade||null, est: estado||null,
     });
 
     const id = r.recordset[0].id;
@@ -141,7 +147,8 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { nome, documento, telefone, email, endereco, cidade, estado } = req.body;
+    const { nome, nome_fantasia, documento, telefone, email,
+            cep, endereco, numero, bairro, cidade, estado } = req.body;
     if (!nome) return res.status(400).json({ error: 'Nome obrigatório.' });
 
     const ex = await query(
@@ -152,14 +159,17 @@ router.put('/:id', auth, async (req, res) => {
 
     await query(`
       UPDATE Clientes SET
-        nome=@nome, documento=@doc, telefone=@tel, email=@email,
-        endereco=@end, cidade=@cid, estado=@est, atualizado_em=GETDATE()
+        nome=@nome, nome_fantasia=@fantasia, documento=@doc,
+        telefone=@tel, email=@email,
+        cep=@cep, endereco=@end, numero=@num, bairro=@bairro,
+        cidade=@cid, estado=@est, atualizado_em=GETDATE()
       WHERE id=@id AND empresa_id=@emp
     `, {
       id, emp: req.user.empresa_id,
-      nome, doc: documento||null, tel: telefone||null,
-      email: email||null, end: endereco||null,
-      cid: cidade||null, est: estado||null,
+      nome, fantasia: nome_fantasia||null, doc: documento||null,
+      tel: telefone||null, email: email||null,
+      cep: cep||null, end: endereco||null, num: numero||null,
+      bairro: bairro||null, cid: cidade||null, est: estado||null,
     });
 
     const updated = await query(BASE + ' AND id=@id', { emp: req.user.empresa_id, id });

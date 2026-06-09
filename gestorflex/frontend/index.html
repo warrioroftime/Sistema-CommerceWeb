@@ -1061,11 +1061,11 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
     </div>
 
     <!-- Modal Receber -->
-    <div class="modal-overlay" id="modal-receber" onclick="if(event.target===this)closeModal('modal-receber')">
+    <div class="modal-backdrop" id="modal-receber" onclick="if(event.target===this)closeModal('modal-receber')">
       <div class="modal" style="max-width:400px">
         <div class="modal-header">
           <div class="modal-title"><i class="fa-solid fa-hand-holding-dollar" style="margin-right:8px;color:var(--green)"></i>Registrar Recebimento</div>
-          <button class="modal-close" onclick="closeModal('modal-receber')">✕</button>
+          <button class="btn-icon" onclick="closeModal('modal-receber')">✕</button>
         </div>
         <div class="modal-body">
           <input type="hidden" id="rec-venda-id">
@@ -1310,17 +1310,53 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
 
 <!-- Cliente -->
 <div class="modal-backdrop" id="modal-cliente">
-  <div class="modal">
+  <div class="modal" style="max-width:640px">
     <div class="modal-header"><span class="modal-title" id="mc-titulo">Novo Cliente</span><button class="btn-icon" onclick="closeModal('modal-cliente')">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="mc-id">
+
+      <!-- CPF / CNPJ com busca automática -->
+      <div class="form-group">
+        <label class="form-label">CPF / CNPJ</label>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <input class="form-input" id="mc-doc" placeholder="000.000.000-00 ou 00.000.000/0001-00" oninput="mcDocInput(this)" style="flex:1">
+          <button type="button" class="btn btn-secondary" id="mc-cnpj-btn" onclick="mcBuscarCNPJ()" style="display:none;white-space:nowrap;height:38px">
+            <i class="fa-solid fa-magnifying-glass"></i> Buscar CNPJ
+          </button>
+        </div>
+        <div class="form-hint" id="mc-cnpj-status"></div>
+      </div>
+
+      <!-- Razão Social / Nome Fantasia -->
       <div class="form-row cols-2">
-        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nome / Razão Social *</label><input class="form-input" id="mc-nome" placeholder="Nome completo ou razão social"></div>
-        <div class="form-group"><label class="form-label">CPF / CNPJ</label><input class="form-input" id="mc-doc" placeholder="000.000.000-00"></div>
+        <div class="form-group"><label class="form-label">Razão Social / Nome *</label><input class="form-input" id="mc-nome" placeholder="Nome completo ou razão social"></div>
+        <div class="form-group"><label class="form-label">Nome Fantasia</label><input class="form-input" id="mc-fantasia" placeholder="Nome fantasia (opcional)"></div>
+      </div>
+
+      <!-- Telefone / Email -->
+      <div class="form-row cols-2">
         <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="mc-tel" placeholder="(00) 00000-0000"></div>
-        <div class="form-group" style="grid-column:1/-1"><label class="form-label">E-mail</label><input class="form-input" id="mc-email" type="email"></div>
-        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Endereço</label><input class="form-input" id="mc-end" placeholder="Rua, número, bairro"></div>
-        <div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="mc-cidade"></div>
+        <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="mc-email" type="email" placeholder="email@exemplo.com"></div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Endereço</div>
+
+      <!-- CEP -->
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">CEP</label><input class="form-input" id="mc-cep" placeholder="00000-000"></div>
+        <div></div>
+      </div>
+
+      <!-- Endereço / Número -->
+      <div class="form-row cols-2">
+        <div class="form-group"><label class="form-label">Endereço</label><input class="form-input" id="mc-end" placeholder="Rua, Avenida..."></div>
+        <div class="form-group"><label class="form-label">Número</label><input class="form-input" id="mc-numero" placeholder="Nº"></div>
+      </div>
+
+      <!-- Bairro / Cidade / Estado -->
+      <div class="form-row cols-3">
+        <div class="form-group"><label class="form-label">Bairro</label><input class="form-input" id="mc-bairro" placeholder="Bairro"></div>
+        <div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="mc-cidade" placeholder="Cidade"></div>
         <div class="form-group"><label class="form-label">Estado</label>
           <select class="form-select" id="mc-estado"><option value="">UF</option><option>AC</option><option>AL</option><option>AM</option><option>AP</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MG</option><option>MS</option><option>MT</option><option>PA</option><option>PB</option><option>PE</option><option>PI</option><option>PR</option><option>RJ</option><option>RN</option><option>RO</option><option>RR</option><option>RS</option><option>SC</option><option>SE</option><option>SP</option><option>TO</option></select>
         </div>
@@ -1920,11 +1956,18 @@ async function loadClientes() {
   } catch (err) { toast(err.message, 'error'); }
 }
 
+function mcLimparCampos() {
+  ['mc-nome','mc-fantasia','mc-doc','mc-tel','mc-email',
+   'mc-cep','mc-end','mc-numero','mc-bairro','mc-cidade'].forEach(f => qs('#'+f).value = '');
+  qs('#mc-estado').value = '';
+  qs('#mc-cnpj-btn').style.display = 'none';
+  qs('#mc-cnpj-status').textContent = '';
+}
+
 function abrirModalCliente() {
   document.getElementById('mc-titulo').textContent = 'Novo Cliente';
   document.getElementById('mc-id').value = '';
-  ['mc-nome','mc-doc','mc-tel','mc-email','mc-end','mc-cidade'].forEach(f => qs('#'+f).value = '');
-  qs('#mc-estado').value = '';
+  mcLimparCampos();
   openModal('modal-cliente');
 }
 
@@ -1933,13 +1976,19 @@ async function editarCliente(id) {
     const c = await api.get('/clientes/' + id);
     document.getElementById('mc-titulo').textContent = 'Editar Cliente';
     document.getElementById('mc-id').value = id;
-    qs('#mc-nome').value    = c.nome||'';
-    qs('#mc-doc').value     = c.documento||'';
-    qs('#mc-tel').value     = c.telefone||'';
-    qs('#mc-email').value   = c.email||'';
-    qs('#mc-end').value     = c.endereco||'';
-    qs('#mc-cidade').value  = c.cidade||'';
-    qs('#mc-estado').value  = c.estado||'';
+    qs('#mc-nome').value     = c.nome||'';
+    qs('#mc-fantasia').value = c.nome_fantasia||'';
+    qs('#mc-doc').value      = c.documento||'';
+    qs('#mc-tel').value      = c.telefone||'';
+    qs('#mc-email').value    = c.email||'';
+    qs('#mc-cep').value      = c.cep||'';
+    qs('#mc-end').value      = c.endereco||'';
+    qs('#mc-numero').value   = c.numero||'';
+    qs('#mc-bairro').value   = c.bairro||'';
+    qs('#mc-cidade').value   = c.cidade||'';
+    qs('#mc-estado').value   = c.estado||'';
+    qs('#mc-cnpj-btn').style.display = 'none';
+    qs('#mc-cnpj-status').textContent = '';
     openModal('modal-cliente');
   } catch (err) { toast(err.message,'error'); }
 }
@@ -1947,13 +1996,17 @@ async function editarCliente(id) {
 async function salvarCliente() {
   const id   = qsV('#mc-id');
   const body = {
-    nome:      qsV('#mc-nome').trim(),
-    documento: qsV('#mc-doc').trim()||null,
-    telefone:  qsV('#mc-tel').trim()||null,
-    email:     qsV('#mc-email').trim()||null,
-    endereco:  qsV('#mc-end').trim()||null,
-    cidade:    qsV('#mc-cidade').trim()||null,
-    estado:    qsV('#mc-estado')||null,
+    nome:          qsV('#mc-nome').trim(),
+    nome_fantasia: qsV('#mc-fantasia').trim()||null,
+    documento:     qsV('#mc-doc').trim()||null,
+    telefone:      qsV('#mc-tel').trim()||null,
+    email:         qsV('#mc-email').trim()||null,
+    cep:           qsV('#mc-cep').trim()||null,
+    endereco:      qsV('#mc-end').trim()||null,
+    numero:        qsV('#mc-numero').trim()||null,
+    bairro:        qsV('#mc-bairro').trim()||null,
+    cidade:        qsV('#mc-cidade').trim()||null,
+    estado:        qsV('#mc-estado')||null,
   };
   if (!body.nome) { toast('Nome obrigatório.','error'); return; }
   setBtnLoading('mc-btn-salvar', true);
@@ -1967,6 +2020,48 @@ async function salvarCliente() {
     toast(err.message, 'error');
   } finally {
     setBtnLoading('mc-btn-salvar', false);
+  }
+}
+
+function mcDocInput(el) {
+  const digits = el.value.replace(/\D/g, '');
+  const btn = qs('#mc-cnpj-btn');
+  btn.style.display = digits.length === 14 ? 'inline-flex' : 'none';
+  if (digits.length === 14) qs('#mc-cnpj-status').textContent = 'CNPJ detectado — clique em Buscar para preencher os dados.';
+  else qs('#mc-cnpj-status').textContent = '';
+}
+
+async function mcBuscarCNPJ() {
+  const cnpj = qsV('#mc-doc').replace(/\D/g, '');
+  const status = qs('#mc-cnpj-status');
+  const btn = qs('#mc-cnpj-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Buscando...';
+  status.style.color = 'var(--text3)';
+  status.textContent = 'Consultando Receita Federal...';
+  try {
+    const d = await api.get('/cnpj/' + cnpj);
+    qs('#mc-nome').value     = d.razao_social || '';
+    qs('#mc-fantasia').value = d.nome_fantasia || '';
+    qs('#mc-tel').value      = d.telefone || '';
+    qs('#mc-email').value    = d.email || '';
+    qs('#mc-cep').value      = d.cep || '';
+    if (d.endereco) {
+      const partes = d.endereco.split(',');
+      qs('#mc-end').value    = partes[0]?.trim() || d.endereco;
+      qs('#mc-numero').value = partes[1]?.trim() || '';
+    }
+    qs('#mc-bairro').value   = d.bairro || '';
+    qs('#mc-cidade').value   = d.cidade || '';
+    qs('#mc-estado').value   = d.estado || '';
+    status.style.color = 'var(--green)';
+    status.textContent = '✓ Dados preenchidos automaticamente. Confira e ajuste se necessário.';
+  } catch (err) {
+    status.style.color = 'var(--red)';
+    status.textContent = '✗ ' + (err.message || 'CNPJ não encontrado.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Buscar CNPJ';
   }
 }
 

@@ -128,7 +128,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);background-at
 #topbar{background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .topbar-title{font-size:15px;font-weight:600}
 .topbar-right{display:flex;align-items:center;gap:8px}
-#content{padding:24px;flex:1;overflow-y:auto;overflow-x:hidden}
+#content{padding:24px;flex:1;overflow-y:auto;overflow-x:hidden;overflow-anchor:none}
 
 /* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all var(--dur) var(--ease);line-height:1.4;text-decoration:none;white-space:nowrap;font-family:inherit;letter-spacing:-.01em}
@@ -202,7 +202,7 @@ table.data tbody tr:hover td{background:rgba(37,99,235,.04)}
 /* ── PAGES ── */
 .page{display:none}
 .page.active{display:block;animation:pageFadeIn .2s var(--ease)}
-@keyframes pageFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pageFadeIn{from{opacity:0}to{opacity:1}}
 /* Garante que AOS nunca esconde/desloca conteúdo dentro de páginas ativas */
 .page.active [data-aos][data-aos]{opacity:1!important;transform:none!important;transition:none!important}
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
@@ -500,52 +500,52 @@ code.tag{font-size:11px;background:var(--blue-glass);color:var(--blue);padding:2
   <nav class="sidebar-nav">
     <div class="nav-section">
       <div class="nav-label">Principal</div>
-      <a class="nav-item active" href="#" onclick="navigate('dashboard')">
+      <a class="nav-item active" href="javascript:void(0)" onclick="navigate('dashboard')">
         <i class="fa-solid fa-gauge-high"></i> Dashboard
       </a>
-      <a class="nav-item" href="#" onclick="navigate('pdv')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('pdv')">
         <i class="fa-solid fa-store"></i> PDV
       </a>
-      <a class="nav-item" href="#" onclick="navigate('vendas')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('vendas')">
         <i class="fa-solid fa-cash-register"></i> Nova Venda
       </a>
-      <a class="nav-item" href="#" onclick="navigate('historico')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('historico')">
         <i class="fa-solid fa-receipt"></i> Histórico de Vendas
       </a>
     </div>
     <div class="nav-section">
       <div class="nav-label">Cadastros</div>
-      <a class="nav-item" href="#" onclick="navigate('produtos')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('produtos')">
         <i class="fa-solid fa-cubes"></i> Produtos
       </a>
-      <a class="nav-item" href="#" onclick="navigate('clientes')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('clientes')">
         <i class="fa-solid fa-users"></i> Clientes
       </a>
     </div>
     <div class="nav-section">
       <div class="nav-label">Estoque</div>
-      <a class="nav-item" href="#" onclick="navigate('estoque')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('estoque')">
         <i class="fa-solid fa-warehouse"></i> Posição do Estoque
       </a>
-      <a class="nav-item" href="#" onclick="navigate('movimentacoes')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('movimentacoes')">
         <i class="fa-solid fa-right-left"></i> Movimentações
       </a>
     </div>
     <div class="nav-section">
       <div class="nav-label">Financeiro</div>
-      <a class="nav-item" href="#" onclick="navigate('contas-receber')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('contas-receber')">
         <i class="fa-solid fa-hand-holding-dollar"></i> Contas a Receber
       </a>
-      <a class="nav-item" href="#" onclick="navigate('relatorios')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('relatorios')">
         <i class="fa-solid fa-chart-bar"></i> Relatórios
       </a>
     </div>
     <div class="nav-section" id="nav-admin" style="display:none">
       <div class="nav-label">Administração</div>
-      <a class="nav-item" href="#" onclick="navigate('empresas')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('empresas')">
         <i class="fa-solid fa-building"></i> Empresas
       </a>
-      <a class="nav-item" href="#" onclick="navigate('adm-usuarios')">
+      <a class="nav-item" href="javascript:void(0)" onclick="navigate('adm-usuarios')">
         <i class="fa-solid fa-users-gear"></i> Usuários
       </a>
     </div>
@@ -1579,8 +1579,10 @@ function navigate(page) {
   const pageEl = document.getElementById('page-' + page);
   pageEl.classList.add('active');
   document.getElementById('topbar-title').textContent = pageNames[page] || page;
-  document.getElementById('content').scrollTop = 0;
+  const contentEl = document.getElementById('content');
+  contentEl.scrollTop = 0;
   if (pageLoaders[page]) pageLoaders[page]();
+  requestAnimationFrame(() => { contentEl.scrollTop = 0; });
   return false;
 }
 

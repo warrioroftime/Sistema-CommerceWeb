@@ -28,6 +28,7 @@ app.use('/api/estoque',    require('./routes/estoque'));
 app.use('/api/relatorios',      require('./routes/relatorios'));
 app.use('/api/contas-receber', require('./routes/contas-receber'));
 app.use('/api/admin',          require('./routes/admin'));
+app.use('/api/saas',           require('./routes/saas'));
 app.use('/api/cnpj',           require('./routes/cnpj'));
 
 // ── Handler de erros ────────────────────────────────────────────

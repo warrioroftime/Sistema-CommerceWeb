@@ -17,10 +17,17 @@ function auth(req, res, next) {
 }
 
 function adminOnly(req, res, next) {
-  if (req.user.perfil !== 'admin') {
+  if (!['admin','super_admin'].includes(req.user.perfil)) {
     return res.status(403).json({ error: 'Acesso restrito a administradores.' });
   }
   next();
 }
 
-module.exports = { auth, adminOnly };
+function superAdminOnly(req, res, next) {
+  if (req.user.perfil !== 'super_admin') {
+    return res.status(403).json({ error: 'Acesso restrito ao super administrador da plataforma.' });
+  }
+  next();
+}
+
+module.exports = { auth, adminOnly, superAdminOnly };

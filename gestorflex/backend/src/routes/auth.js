@@ -13,19 +13,33 @@ router.post('/login', async (req, res) => {
 
     const result = await query(`
       SELECT u.id, u.empresa_id, u.nome, u.email, u.senha_hash, u.perfil, u.ativo, u.foto,
-             e.razao_social AS empresa_nome
+             e.razao_social AS empresa_nome,
+             a.status AS assinatura_status, a.data_fim AS assinatura_fim
       FROM Usuarios u
-      JOIN Empresas e ON e.id = u.empresa_id
-      WHERE u.email = @email AND e.ativo = 1
+      LEFT JOIN Empresas e ON e.id = u.empresa_id
+      LEFT JOIN Assinaturas a ON a.empresa_id = e.id
+      WHERE u.email = @email
+        AND u.ativo = 1
+        AND (u.perfil = 'super_admin' OR e.ativo = 1)
     `, { email });
 
     const user = result.recordset[0];
-    if (!user || !user.ativo) {
+    if (!user) {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
     const ok = await bcrypt.compare(senha, user.senha_hash);
     if (!ok) return res.status(401).json({ error: 'Credenciais inválidas.' });
+
+    // Bloquear login se assinatura suspensa ou cancelada
+    if (user.perfil !== 'super_admin' && user.assinatura_status) {
+      if (['suspenso','cancelado'].includes(user.assinatura_status)) {
+        return res.status(403).json({ error: 'Acesso bloqueado. Assinatura ' + user.assinatura_status + '. Contate o administrador da plataforma.' });
+      }
+      if (user.assinatura_fim && new Date(user.assinatura_fim) < new Date()) {
+        return res.status(403).json({ error: 'Assinatura expirada. Renove seu plano para continuar.' });
+      }
+    }
 
     const payload = {
       id:           user.id,
@@ -33,7 +47,7 @@ router.post('/login', async (req, res) => {
       nome:         user.nome,
       email:        user.email,
       perfil:       user.perfil,
-      empresa_nome: user.empresa_nome,
+      empresa_nome: user.empresa_nome || 'CommerceWeb',
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {

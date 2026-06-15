@@ -1,6 +1,6 @@
 // src/routes/produtos.js
 const router = require('express').Router();
-const { query, sql } = require('../db');
+const { query } = require('../db');
 const { auth } = require('../middleware/auth');
 
 const BASE = `
@@ -21,7 +21,7 @@ router.get('/', auth, async (req, res) => {
     const params = { emp: req.user.empresa_id };
 
     if (busca) {
-      where += ` AND (p.descricao LIKE @busca OR p.codigo LIKE @busca)`;
+      where += ` AND (p.descricao ILIKE @busca OR p.codigo ILIKE @busca)`;
       params.busca = `%${busca}%`;
     }
     if (categoria) { where += ` AND c.nome = @cat`; params.cat = categoria; }
@@ -37,7 +37,7 @@ router.get('/', auth, async (req, res) => {
       LEFT JOIN Categorias c ON c.id = p.categoria_id
       WHERE ${where}
       ORDER BY p.descricao
-      OFFSET ${offset} ROWS FETCH NEXT ${parseInt(limit)} ROWS ONLY
+      LIMIT ${parseInt(limit)} OFFSET ${offset}
     `, params);
 
     const total = await query(
@@ -45,14 +45,14 @@ router.get('/', auth, async (req, res) => {
       params
     );
 
-    res.json({ data: r.recordset, total: total.recordset[0].n });
+    res.json({ data: r.recordset, total: parseInt(total.recordset[0].n) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao listar produtos.' });
   }
 });
 
-// GET /api/produtos/categorias — lista categorias da empresa
+// GET /api/produtos/categorias
 router.get('/categorias', auth, async (req, res) => {
   try {
     const r = await query(
@@ -99,8 +99,8 @@ router.post('/', auth, async (req, res) => {
     const r = await query(`
       INSERT INTO Produtos (empresa_id, codigo, descricao, categoria_id, preco_custo, preco_venda,
                             estoque, estoque_min, status, controla_estoque, foto)
-      OUTPUT INSERTED.id
       VALUES (@emp, @cod, @desc, @cat, @custo, @preco, @est, @min, @st, @ce, @foto)
+      RETURNING id
     `, {
       emp:   req.user.empresa_id,
       cod:   codigo,
@@ -111,13 +111,12 @@ router.post('/', auth, async (req, res) => {
       est:   estoque,
       min:   estoque_min,
       st:    status,
-      ce:    controla_estoque !== false ? 1 : 0,
+      ce:    controla_estoque !== false,
       foto:  foto || null,
     });
 
     const newId = r.recordset[0].id;
 
-    // Registrar movimentação de estoque se estoque inicial > 0
     if (parseInt(estoque) > 0) {
       await query(`
         INSERT INTO MovimentacoesEstoque
@@ -126,10 +125,7 @@ router.post('/', auth, async (req, res) => {
       `, { emp: req.user.empresa_id, pid: newId, qtd: parseInt(estoque), uid: req.user.id });
     }
 
-    const prod = await query(
-      BASE + ' AND p.id = @id',
-      { emp: req.user.empresa_id, id: newId }
-    );
+    const prod = await query(BASE + ' AND p.id = @id', { emp: req.user.empresa_id, id: newId });
     res.status(201).json(prod.recordset[0]);
   } catch (err) {
     console.error(err);
@@ -144,14 +140,12 @@ router.put('/:id', auth, async (req, res) => {
             estoque_min, status, controla_estoque, foto } = req.body;
     const id = parseInt(req.params.id);
 
-    // Verificar posse
     const ex = await query(
       'SELECT id FROM Produtos WHERE id=@id AND empresa_id=@emp',
       { id, emp: req.user.empresa_id }
     );
     if (!ex.recordset.length) return res.status(404).json({ error: 'Produto não encontrado.' });
 
-    // Código duplicado (exceto o próprio)
     if (codigo) {
       const dup = await query(
         'SELECT id FROM Produtos WHERE empresa_id=@emp AND codigo=@cod AND id<>@id',
@@ -171,7 +165,7 @@ router.put('/:id', auth, async (req, res) => {
         status           = COALESCE(@st,   status),
         controla_estoque = COALESCE(@ce,   controla_estoque),
         foto             = CASE WHEN @foto IS NOT NULL THEN @foto ELSE foto END,
-        atualizado_em    = GETDATE()
+        atualizado_em    = NOW()
       WHERE id=@id AND empresa_id=@emp
     `, {
       id, emp: req.user.empresa_id,
@@ -182,7 +176,7 @@ router.put('/:id', auth, async (req, res) => {
       preco: preco_venda   ?? null,
       min:   estoque_min   ?? null,
       st:    status        ?? null,
-      ce:    controla_estoque !== undefined ? (controla_estoque !== false ? 1 : 0) : null,
+      ce:    controla_estoque !== undefined ? (controla_estoque !== false) : null,
       foto:  foto !== undefined ? (foto || null) : null,
     });
 
@@ -198,14 +192,12 @@ router.put('/:id', auth, async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    // Verificar se há itens de venda referenciando
     const ref = await query(
-      'SELECT TOP 1 id FROM ItensVenda WHERE produto_id=@id', { id }
+      'SELECT id FROM ItensVenda WHERE produto_id=@id LIMIT 1', { id }
     );
     if (ref.recordset.length) {
-      // Apenas inativar, não excluir fisicamente
       await query(
-        'UPDATE Produtos SET status=\'inativo\', atualizado_em=GETDATE() WHERE id=@id AND empresa_id=@emp',
+        "UPDATE Produtos SET status='inativo', atualizado_em=NOW() WHERE id=@id AND empresa_id=@emp",
         { id, emp: req.user.empresa_id }
       );
       return res.json({ ok: true, aviso: 'Produto possui vendas; foi inativado em vez de excluído.' });

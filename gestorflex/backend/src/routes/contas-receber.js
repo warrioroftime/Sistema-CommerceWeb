@@ -12,10 +12,10 @@ router.get('/', auth, async (req, res) => {
     let where = `cr.empresa_id = @emp`;
     const params = { emp };
 
-    if (status)     { where += ` AND cr.status = @st`;        params.st  = status; }
-    if (cliente_id) { where += ` AND cr.cliente_id = @cid`;   params.cid = parseInt(cliente_id); }
-    if (de)         { where += ` AND cr.criado_em >= @de`;     params.de  = new Date(de + 'T00:00:00'); }
-    if (ate)        { where += ` AND cr.criado_em <= @ate`;    params.ate = new Date(ate + 'T23:59:59'); }
+    if (status)     { where += ` AND cr.status = @st`;       params.st  = status; }
+    if (cliente_id) { where += ` AND cr.cliente_id = @cid`;  params.cid = parseInt(cliente_id); }
+    if (de)         { where += ` AND cr.criado_em >= @de`;   params.de  = new Date(de + 'T00:00:00'); }
+    if (ate)        { where += ` AND cr.criado_em <= @ate`;  params.ate = new Date(ate + 'T23:59:59'); }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -33,12 +33,12 @@ router.get('/', auth, async (req, res) => {
         CASE cr.status WHEN 'pendente' THEN 0 ELSE 1 END,
         cr.data_vencimento ASC,
         cr.criado_em DESC
-      OFFSET ${offset} ROWS FETCH NEXT ${parseInt(limit)} ROWS ONLY
+      LIMIT ${parseInt(limit)} OFFSET ${offset}
     `, params);
 
     const tot = await query(`
       SELECT
-        COUNT(*)  AS n,
+        COUNT(*) AS n,
         COALESCE(SUM(CASE WHEN cr.status='pendente' THEN cr.valor ELSE 0 END),0) AS total_pendente,
         COALESCE(SUM(CASE WHEN cr.status='recebido' THEN cr.valor ELSE 0 END),0) AS total_recebido
       FROM ContasReceber cr
@@ -47,10 +47,10 @@ router.get('/', auth, async (req, res) => {
     `, params);
 
     res.json({
-      data:            r.recordset,
-      total:           tot.recordset[0].n,
-      total_pendente:  tot.recordset[0].total_pendente,
-      total_recebido:  tot.recordset[0].total_recebido,
+      data:           r.recordset,
+      total:          parseInt(tot.recordset[0].n),
+      total_pendente: parseFloat(tot.recordset[0].total_pendente),
+      total_recebido: parseFloat(tot.recordset[0].total_recebido),
     });
   } catch (err) {
     console.error(err);
@@ -73,10 +73,10 @@ router.put('/:id/receber', auth, async (req, res) => {
     if (rec.recordset[0].status === 'recebido')
       return res.status(400).json({ error: 'Esta parcela já foi recebida.' });
 
-    const val = parseFloat(valor_recebido) || rec.recordset[0].valor;
+    const val = parseFloat(valor_recebido) || parseFloat(rec.recordset[0].valor);
     await query(
       `UPDATE ContasReceber
-       SET status='recebido', data_recebimento=GETDATE(), valor_recebido=@vr,
+       SET status='recebido', data_recebimento=NOW(), valor_recebido=@vr,
            observacao=COALESCE(@obs, observacao)
        WHERE id=@id AND empresa_id=@emp`,
       { id, emp, vr: val, obs: observacao || null }
@@ -99,7 +99,6 @@ router.put('/:id/cancelar', auth, async (req, res) => {
     );
     res.json({ ok: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: 'Erro ao cancelar.' });
   }
 });

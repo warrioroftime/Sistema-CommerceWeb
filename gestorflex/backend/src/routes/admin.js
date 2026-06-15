@@ -34,8 +34,8 @@ router.post('/empresas', async (req, res) => {
 
     const r = await query(`
       INSERT INTO Empresas (razao_social, cnpj, email, telefone)
-      OUTPUT INSERTED.id
       VALUES (@razao_social, @cnpj, @email, @telefone)
+      RETURNING id
     `, { razao_social, cnpj: cnpj||null, email: email||null, telefone: telefone||null });
 
     res.status(201).json({ id: r.recordset[0].id });
@@ -67,9 +67,10 @@ router.put('/empresas/:id', async (req, res) => {
 // PATCH /api/admin/empresas/:id/toggle
 router.patch('/empresas/:id/toggle', async (req, res) => {
   try {
-    await query(`
-      UPDATE Empresas SET ativo = CASE WHEN ativo=1 THEN 0 ELSE 1 END WHERE id=@id
-    `, { id: parseInt(req.params.id) });
+    await query(
+      'UPDATE Empresas SET ativo = NOT ativo WHERE id=@id',
+      { id: parseInt(req.params.id) }
+    );
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -111,13 +112,13 @@ router.post('/usuarios', async (req, res) => {
     const hash = await bcrypt.hash(senha, 10);
     const r = await query(`
       INSERT INTO Usuarios (empresa_id, nome, email, senha_hash, perfil, foto)
-      OUTPUT INSERTED.id
       VALUES (@empresa_id, @nome, @email, @hash, @perfil, @foto)
+      RETURNING id
     `, { empresa_id: parseInt(empresa_id), nome, email, hash, perfil: perfil||'operador', foto: foto||null });
 
     res.status(201).json({ id: r.recordset[0].id });
   } catch (err) {
-    if (err.message && err.message.includes('UQ_usuarios_email')) {
+    if (err.message && err.message.includes('uq_usuarios_email')) {
       return res.status(400).json({ error: 'E-mail já cadastrado nesta empresa.' });
     }
     console.error(err);
@@ -148,9 +149,10 @@ router.put('/usuarios/:id', async (req, res) => {
 // PATCH /api/admin/usuarios/:id/toggle
 router.patch('/usuarios/:id/toggle', async (req, res) => {
   try {
-    await query(`
-      UPDATE Usuarios SET ativo = CASE WHEN ativo=1 THEN 0 ELSE 1 END WHERE id=@id
-    `, { id: parseInt(req.params.id) });
+    await query(
+      'UPDATE Usuarios SET ativo = NOT ativo WHERE id=@id',
+      { id: parseInt(req.params.id) }
+    );
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
@@ -166,7 +168,7 @@ router.post('/usuarios/:id/reset-senha', async (req, res) => {
       return res.status(400).json({ error: 'Senha mínimo 6 caracteres.' });
     }
     const hash = await bcrypt.hash(nova_senha, 10);
-    await query(`UPDATE Usuarios SET senha_hash=@hash WHERE id=@id`, {
+    await query('UPDATE Usuarios SET senha_hash=@hash WHERE id=@id', {
       hash, id: parseInt(req.params.id)
     });
     res.json({ ok: true });

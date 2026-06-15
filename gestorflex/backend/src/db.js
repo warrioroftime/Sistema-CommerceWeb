@@ -1,44 +1,68 @@
-// src/db.js — Conexão com SQL Server via mssql (driver msnodesqlv8)
-const sql = require('mssql/msnodesqlv8');
+// src/db.js — Conexão com PostgreSQL via pg
+const { Pool } = require('pg');
 
-const server   = process.env.DB_SERVER   || '.\\SQLEXPRESS';
-const database = process.env.DB_NAME     || 'GestorFlex';
-const user     = process.env.DB_USER     || 'sa';
-const password = process.env.DB_PASSWORD || '';
+const pool = new Pool({
+  host:     process.env.DB_SERVER   || 'localhost',
+  port:     parseInt(process.env.DB_PORT) || 5432,
+  database: process.env.DB_NAME     || 'commerceweb',
+  user:     process.env.DB_USER     || 'sa',
+  password: process.env.DB_PASSWORD || 'Server123!',
+  max: 10,
+  idleTimeoutMillis: 30000,
+});
 
-const config = {
-  connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${server};Database=${database};UID=${user};PWD=${password};`,
-  pool: { max: 10, min: 0, idleTimeoutMillis: 30000 },
-};
+// Converte @param nomeados para $1 posicionais do PostgreSQL
+// Suporta o mesmo param repetido no mesmo SQL (mapeia para o mesmo $n)
+function namedToPositional(text, params = {}) {
+  const values = [];
+  const nameToIdx = {};
+  const sql = text.replace(/@(\w+)/g, (_, name) => {
+    if (!(name in nameToIdx)) {
+      values.push(params[name] !== undefined ? params[name] : null);
+      nameToIdx[name] = values.length;
+    }
+    return '$' + nameToIdx[name];
+  });
+  return { sql, values };
+}
 
-let pool = null;
+// Query padrão com params nomeados — retorna { recordset, rowCount }
+async function query(text, params = {}) {
+  const { sql, values } = namedToPositional(text, params);
+  const result = await pool.query(sql, values);
+  return {
+    recordset: result.rows,
+    rowCount:  result.rowCount,
+  };
+}
 
-async function getPool() {
-  if (!pool) {
-    pool = await sql.connect(config);
-    console.log('✅ SQL Server conectado:', server, '/', database);
+// Executa um callback dentro de uma transação PostgreSQL
+// O callback recebe `tq` — função de query com mesma assinatura que `query`
+async function withTransaction(callback) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const tq = async (text, params = {}) => {
+      const { sql, values } = namedToPositional(text, params);
+      const r = await client.query(sql, values);
+      return { recordset: r.rows, rowCount: r.rowCount };
+    };
+    const result = await callback(tq);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
+}
+
+// Testa a conexão e retorna o pool (compatibilidade com app.js)
+async function getPool() {
+  await pool.query('SELECT 1');
+  console.log('✅ PostgreSQL conectado:', process.env.DB_SERVER || 'localhost', '/', process.env.DB_NAME || 'commerceweb');
   return pool;
 }
 
-// Atalhos para queries parametrizadas
-async function query(text, params = {}) {
-  const p = await getPool();
-  const req = p.request();
-  for (const [key, val] of Object.entries(params)) {
-    req.input(key, val);
-  }
-  return req.query(text);
-}
-
-async function queryTyped(text, params = []) {
-  // params = [{ name, type, value }]
-  const p = await getPool();
-  const req = p.request();
-  for (const { name, type, value } of params) {
-    req.input(name, type, value);
-  }
-  return req.query(text);
-}
-
-module.exports = { sql, getPool, query, queryTyped };
+module.exports = { query, withTransaction, getPool };

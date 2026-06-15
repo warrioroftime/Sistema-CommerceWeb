@@ -2,7 +2,7 @@
 const router    = require('express').Router();
 const bcrypt    = require('bcryptjs');
 const jwt       = require('jsonwebtoken');
-const { query, sql } = require('../db');
+const { query } = require('../db');
 const { auth }  = require('../middleware/auth');
 
 // POST /api/auth/login
@@ -16,11 +16,11 @@ router.post('/login', async (req, res) => {
              e.razao_social AS empresa_nome,
              a.status AS assinatura_status, a.data_fim AS assinatura_fim
       FROM Usuarios u
-      LEFT JOIN Empresas e ON e.id = u.empresa_id
+      LEFT JOIN Empresas   e ON e.id = u.empresa_id
       LEFT JOIN Assinaturas a ON a.empresa_id = e.id
       WHERE u.email = @email
-        AND u.ativo = 1
-        AND (u.perfil = 'super_admin' OR e.ativo = 1)
+        AND u.ativo = TRUE
+        AND (u.perfil = 'super_admin' OR e.ativo = TRUE)
     `, { email });
 
     const user = result.recordset[0];
@@ -54,7 +54,6 @@ router.post('/login', async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || '8h',
     });
 
-    // foto fora do JWT (base64 pode ser grande demais para o token)
     res.json({ token, user: { ...payload, foto: user.foto || null } });
   } catch (err) {
     console.error('Login error:', err);
@@ -62,7 +61,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/auth/me — retorna dados do usuário atual
+// GET /api/auth/me
 router.get('/me', auth, (req, res) => {
   res.json({ user: req.user });
 });

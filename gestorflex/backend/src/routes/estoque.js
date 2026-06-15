@@ -3,7 +3,7 @@ const router = require('express').Router();
 const { query } = require('../db');
 const { auth } = require('../middleware/auth');
 
-// GET /api/estoque — posição atual de todos os produtos
+// GET /api/estoque
 router.get('/', auth, async (req, res) => {
   try {
     const { busca = '', filtro = '' } = req.query;
@@ -11,7 +11,7 @@ router.get('/', auth, async (req, res) => {
     const params = { emp: req.user.empresa_id };
 
     if (busca) {
-      where += ` AND (p.descricao LIKE @b OR p.codigo LIKE @b)`;
+      where += ` AND (p.descricao ILIKE @b OR p.codigo ILIKE @b)`;
       params.b = `%${busca}%`;
     }
     if (filtro === 'falta')   where += ` AND p.estoque = 0`;
@@ -22,7 +22,7 @@ router.get('/', auth, async (req, res) => {
       SELECT p.id, p.codigo, p.descricao, c.nome AS categoria,
              p.estoque, p.estoque_min,
              CASE
-               WHEN p.estoque = 0            THEN 'falta'
+               WHEN p.estoque = 0              THEN 'falta'
                WHEN p.estoque <= p.estoque_min THEN 'critico'
                ELSE 'ok'
              END AS situacao
@@ -32,11 +32,10 @@ router.get('/', auth, async (req, res) => {
       ORDER BY p.estoque ASC, p.descricao
     `, params);
 
-    // Resumo
     const resumo = await query(`
       SELECT
-        SUM(estoque)                                   AS total_itens,
-        SUM(CASE WHEN estoque = 0 THEN 1 ELSE 0 END)  AS em_falta,
+        COALESCE(SUM(estoque), 0)                                    AS total_itens,
+        SUM(CASE WHEN estoque = 0 THEN 1 ELSE 0 END)                 AS em_falta,
         SUM(CASE WHEN estoque > 0 AND estoque <= estoque_min THEN 1 ELSE 0 END) AS critico
       FROM Produtos WHERE empresa_id=@emp AND status='ativo'
     `, { emp: req.user.empresa_id });
@@ -58,7 +57,7 @@ router.get('/movimentacoes', auth, async (req, res) => {
     if (de)    { where += ` AND m.criado_em >= @de`;  params.de  = new Date(de  + 'T00:00:00'); }
     if (ate)   { where += ` AND m.criado_em <= @ate`; params.ate = new Date(ate + 'T23:59:59'); }
     if (tipo)  { where += ` AND m.tipo = @tipo`;      params.tipo = tipo; }
-    if (busca) { where += ` AND p.descricao LIKE @b`; params.b   = `%${busca}%`; }
+    if (busca) { where += ` AND p.descricao ILIKE @b`; params.b  = `%${busca}%`; }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
@@ -71,7 +70,7 @@ router.get('/movimentacoes', auth, async (req, res) => {
       LEFT JOIN Usuarios u ON u.id = m.usuario_id
       WHERE ${where}
       ORDER BY m.criado_em DESC
-      OFFSET ${offset} ROWS FETCH NEXT ${parseInt(limit)} ROWS ONLY
+      LIMIT ${parseInt(limit)} OFFSET ${offset}
     `, params);
 
     const tot = await query(
@@ -79,14 +78,14 @@ router.get('/movimentacoes', auth, async (req, res) => {
        JOIN Produtos p ON p.id=m.produto_id WHERE ${where}`, params
     );
 
-    res.json({ data: r.recordset, total: tot.recordset[0].n });
+    res.json({ data: r.recordset, total: parseInt(tot.recordset[0].n) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao buscar movimentações.' });
   }
 });
 
-// POST /api/estoque/entrada — entrada manual de mercadoria
+// POST /api/estoque/entrada
 router.post('/entrada', auth, async (req, res) => {
   try {
     const { produto_id, quantidade, preco_custo, observacao } = req.body;
@@ -94,7 +93,6 @@ router.post('/entrada', auth, async (req, res) => {
       return res.status(400).json({ error: 'Produto e quantidade são obrigatórios.' });
     }
 
-    // Verificar produto da empresa
     const pR = await query(
       'SELECT id, descricao, estoque FROM Produtos WHERE id=@pid AND empresa_id=@emp',
       { pid: parseInt(produto_id), emp: req.user.empresa_id }
@@ -106,12 +104,11 @@ router.post('/entrada', auth, async (req, res) => {
     const qtd      = parseInt(quantidade);
     const saldoAt  = saldoAnt + qtd;
 
-    // Atualizar estoque
     await query(`
       UPDATE Produtos
-      SET estoque = estoque + @qtd,
-          preco_custo   = CASE WHEN @custo > 0 THEN @custo ELSE preco_custo END,
-          atualizado_em = GETDATE()
+      SET estoque     = estoque + @qtd,
+          preco_custo = CASE WHEN @custo > 0 THEN @custo ELSE preco_custo END,
+          atualizado_em = NOW()
       WHERE id=@pid AND empresa_id=@emp
     `, {
       pid:   parseInt(produto_id),
@@ -120,7 +117,6 @@ router.post('/entrada', auth, async (req, res) => {
       custo: parseFloat(preco_custo) || 0,
     });
 
-    // Registrar movimentação
     await query(`
       INSERT INTO MovimentacoesEstoque
         (empresa_id, produto_id, tipo, quantidade, saldo_anterior, saldo_atual, origem, usuario_id)
@@ -135,7 +131,6 @@ router.post('/entrada', auth, async (req, res) => {
       uid:  req.user.id,
     });
 
-    // Retornar produto atualizado
     const updated = await query(
       'SELECT id, codigo, descricao, estoque, estoque_min FROM Produtos WHERE id=@pid',
       { pid: parseInt(produto_id) }
